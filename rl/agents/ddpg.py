@@ -265,6 +265,7 @@ class DDPGAgent(Agent):
                 if not self.training:
                     # We're done here. No need to update the experience memory since we only use the working
                     # memory to obtain the state over the most recent observations.
+                    self.metircs = metrics
                     return metrics
                 
                 # Train the network on a single stochastic batch.
@@ -344,16 +345,17 @@ class DDPGAgent(Agent):
                         action_values = self.actor_train_fn(inputs)[0]
                         assert action_values.shape == (self.batch_size, self.nb_actions)
 
-                    #if self.target_model_update >= 1 and self.step % self.target_model_update == 0:
+                    if self.target_model_update >= 1 and self.step % self.target_model_update == 0:
+                        self.update_target_models_hard()
+                    #print self.critic.metrics_names
+                    #print "metrics", metrics 
                     #self.update_target_models_hard()
-                    print self.critic.metrics_names
-                    print "metrics", metrics 
-                    self.update_target_models_hard()
-                    actor_weghtis = self.actor.get_weights()
-                    self.sim_forward_actor.set_weights(actor_weghtis)
+                    #actor_weghtis = self.actor.get_weights()
+                    self.sim_forward_actor.set_weights(self.actor.get_weights())
                     #print "after copy: ", self.sim_forward_actor.get_weights()[0]
                     #print "actor weights: ", actor_weghtis[0]
                     self.backward_start_flag = False
                     self.back_step+=1
+                    self.metircs = metrics
                 mutex.release()
         return metrics

@@ -11,6 +11,7 @@ from threading import Thread,Lock
 from rl.callbacks import TestLogger, TrainEpisodeLogger, TrainIntervalLogger, Visualizer, CallbackList
 mutex = Lock()
 import keras.backend as K
+import time
 
 class Agent(object):
     def __init__(self, processor=None):
@@ -23,6 +24,7 @@ class Agent(object):
         self.backward_start_flag = False
         self.back_step = 0
         self.nb_steps = 0
+        self.metrics = 0
     def get_config(self):
         return {}
     
@@ -124,8 +126,9 @@ class Agent(object):
                     # (forward step) and then use the reward to improve (backward step).
                     K.manual_variable_initialization(True)
                     action = self.forward(observation)
-                    print "forward step: ", self.step
+                    #print "forward step show: ", self.step
                     #print "forward weights: ", self.sim_forward_actor.get_weights()[0]
+                    time.sleep(0.01)
                     K.manual_variable_initialization(False)
                     reward = 0.
                     accumulated_info = {}
@@ -160,7 +163,7 @@ class Agent(object):
                         'action': action,
                         'observation': observation,
                         'reward': reward,
-                    #    'metrics': metrics,
+                        'metrics': self.metrics,
                         'episode': episode,
                         'info': accumulated_info,
                     }

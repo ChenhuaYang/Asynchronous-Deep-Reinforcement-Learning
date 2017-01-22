@@ -66,17 +66,17 @@ print(critic.summary())
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
-memory = SequentialMemory(limit=400000, window_length=1)
+memory = SequentialMemory(limit=100000, window_length=1)
 random_process = OrnsteinUhlenbeckProcess(theta=.15, mu=0., sigma=.3)
 agent = DDPGAgent(nb_actions=nb_actions, actor=actor, forward_actor = actor_1, critic=critic, critic_action_input=action_input,
                   memory=memory, nb_steps_warmup_critic=200, nb_steps_warmup_actor=200,
                   random_process=random_process, gamma=.99, batch_size = 32, target_model_update=1e-3)
-agent.compile(Adam(lr=.0001, clipnorm=1.), metrics=['mae'])
+agent.compile(Adam(lr=.001, clipnorm=1.), metrics=['mae'])
 
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
-agent.fit(env, nb_steps = 20000, visualize=True, verbose=0, nb_max_episode_steps=300)
+agent.fit(env, nb_steps = 50000, visualize=True, verbose=0, nb_max_episode_steps=300)
 
 ## After training is done, we save the final weights.
 #agent.save_weights('ddpg_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
