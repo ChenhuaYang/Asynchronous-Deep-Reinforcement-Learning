@@ -75,6 +75,7 @@ class Agent(object):
         t = Thread(target = self.backward,args=[0, False])
         t.start()
         try:
+            # maker sure forwad and backward are in the same graph
             with self.sess.graph.as_default():
                 #while self.step < nb_steps:
                 while self.back_step < nb_steps:
@@ -128,7 +129,7 @@ class Agent(object):
                     action = self.forward(observation)
                     #print "forward step show: ", self.step
                     #print "forward weights: ", self.sim_forward_actor.get_weights()[0]
-                    time.sleep(0.01)
+                    #time.sleep(0.01)
                     K.manual_variable_initialization(False)
                     reward = 0.
                     accumulated_info = {}
@@ -273,7 +274,6 @@ class Agent(object):
             done = False
             while not done:
                 callbacks.on_step_begin(episode_step)
-
                 action = self.forward(observation)
                 reward = 0.
                 accumulated_info = {}

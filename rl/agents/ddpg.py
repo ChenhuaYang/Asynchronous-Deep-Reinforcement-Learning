@@ -20,10 +20,25 @@ def mean_q(y_true, y_pred):
 # http://arxiv.org/pdf/1509.02971v2.pdf
 # http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.4324&rep=rep1&type=pdf
 class DDPGAgent(Agent):
-    def __init__(self, nb_actions, actor, forward_actor,critic, critic_action_input, memory,
-                 gamma=.99, batch_size=32, nb_steps_warmup_critic=1000, nb_steps_warmup_actor=1000,
-                 train_interval=1, memory_interval=1, delta_range=None, delta_clip=np.inf,
-                 random_process=None, custom_model_objects={}, target_model_update=.001, **kwargs):
+    def __init__(self, 
+                nb_actions, 
+                actor, 
+                #forward_actor,
+                critic, 
+                critic_action_input, 
+                memory,
+                gamma=.99, 
+                batch_size=32, 
+                nb_steps_warmup_critic=1000, 
+                nb_steps_warmup_actor=1000,
+                train_interval=1, 
+                memory_interval=1, 
+                delta_range=None, 
+                delta_clip=np.inf,
+                random_process=None, 
+                custom_model_objects={}, 
+                target_model_update=.001, 
+                **kwargs):
         if hasattr(actor.output, '__len__') and len(actor.output) > 1:
             raise ValueError('Actor "{}" has more than one output. DDPG expects an actor that has a single output.'.format(actor))
         if hasattr(critic.output, '__len__') and len(critic.output) > 1:
@@ -64,7 +79,7 @@ class DDPGAgent(Agent):
 
         # Related objects.
         self.actor = actor
-        self.sim_forward_actor = forward_actor
+        #self.sim_forward_actor = forward_actor
         self.critic = critic
         self.critic_action_input = critic_action_input
         self.critic_action_input_idx = self.critic.input.index(critic_action_input)
@@ -105,8 +120,7 @@ class DDPGAgent(Agent):
 
         
         # Simulation forward network
-        #self.sim_forward_actor = clone_model(self.actor, self.custom_model_objects)
-        #self.sim_forward_actor = self.forward_actor
+        self.sim_forward_actor = clone_model(self.actor, self.custom_model_objects)
         self.sim_forward_actor.compile(optimizer='sgd', loss='mse')
         
         # We also compile the actor. We never optimize the actor using Keras but instead compute
@@ -347,8 +361,8 @@ class DDPGAgent(Agent):
 
                     if self.target_model_update >= 1 and self.step % self.target_model_update == 0:
                         self.update_target_models_hard()
-                    #print self.critic.metrics_names
-                    #print "metrics", metrics 
+                    print self.critic.metrics_names
+                    print "metrics", metrics 
                     #self.update_target_models_hard()
                     #actor_weghtis = self.actor.get_weights()
                     self.sim_forward_actor.set_weights(self.actor.get_weights())
